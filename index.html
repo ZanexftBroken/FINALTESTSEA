@@ -34,7 +34,6 @@
             padding: 20px;
         }
         
-        /* Header Styles */
         header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
@@ -88,6 +87,7 @@
         .btn-group {
             display: flex;
             gap: 15px;
+            margin-bottom: 20px;
         }
         
         button {
@@ -129,7 +129,6 @@
             transform: translateY(-2px);
         }
         
-        /* Loading Spinner */
         .loading {
             display: none;
             text-align: center;
@@ -150,13 +149,160 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        /* Rest of the CSS remains the same as previous version */
-        .form-container, .search-container, .profile-cards {
-            /* Previous styles */
+
+        .search-container {
+            display: none;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         
-        /* Add any other necessary styles from previous version */
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .search-box button {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .form-container {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--success);
+            border-radius: 5px;
+        }
+        
+        .profile-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .profile-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .card-details {
+            margin-bottom: 15px;
+        }
+        
+        .card-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+            font-size: 18px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #777;
+            border-top: 1px solid #eee;
+        }
     </style>
 </head>
 <body>
@@ -166,7 +312,7 @@
                 <h1>SEAMAN Agency - Google Sheets Database</h1>
                 <div class="sync-status">
                     <div class="sync-indicator" id="syncIndicator"></div>
-                    <span id="syncStatus">Connected to Google Sheets</span>
+                    <span id="syncStatus">Loading...</span>
                 </div>
             </div>
         </header>
@@ -183,7 +329,6 @@
             <button id="exportBtn" class="btn-primary">Export to Sheet</button>
         </div>
         
-        <!-- Rest of your HTML structure remains the same -->
         <div id="searchContainer" class="search-container">
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Enter name, rank, or NRC to search...">
@@ -195,7 +340,6 @@
             <h2 class="form-title">Add New Seaman Profile</h2>
             <form id="profileForm">
                 <div class="form-grid">
-                    <!-- Your form fields here (same as before) -->
                     <div class="form-group">
                         <label for="name">Full Name</label>
                         <input type="text" id="name" required>
@@ -281,11 +425,10 @@
     </div>
 
     <script>
-        // Google Sheets Configuration
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzuCkPvuI3MFmWz1QCNtlUzmspE_ZSTGIhiC3hAHYGG6C-DesSxlGVvzbPIpJk2YqCI/exec'; // Replace with your deployed Apps Script URL
+        // Google Sheets Configuration - YOUR SCRIPT URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9G2cBvsdPhQtMpL-pNXkVqybkAVhgBVM9-cnxL_JvuuW2TfzUDtPTtdPFoF7zbIpF6Q/exec';
         
         let profiles = [];
-        let isOnline = true;
 
         // DOM elements
         const loading = document.getElementById('loading');
@@ -338,7 +481,7 @@
                 
                 if (data.success) {
                     profiles = data.data;
-                    updateSyncStatus('Connected to Google Sheets', 'connected');
+                    updateSyncStatus(`Connected - ${profiles.length} profiles loaded`, 'connected');
                     displayProfiles(profiles);
                 } else {
                     throw new Error(data.error || 'Failed to load data');
@@ -395,7 +538,7 @@
                     localStorage.setItem('profiles', JSON.stringify(profiles));
                     hideForm();
                     displayProfiles(profiles);
-                    updateSyncStatus('Data saved to Google Sheets', 'connected');
+                    updateSyncStatus(`Data saved - ${profiles.length} profiles`, 'connected');
                 } else {
                     throw new Error(result.error || 'Failed to save data');
                 }
@@ -450,8 +593,8 @@
                 }
             } catch (error) {
                 console.error('Sync error:', error);
-                updateSyncStatus('Sync failed', 'error');
-                alert('Sync failed. Please try again later.');
+                updateSyncStatus('Sync failed: ' + error.message, 'error');
+                alert('Sync failed: ' + error.message);
             } finally {
                 hideLoading();
             }
@@ -477,13 +620,15 @@
                 if (result.success) {
                     alert('Data exported to Google Sheets successfully!');
                     updateSyncStatus('Data exported successfully', 'connected');
+                    // Reload data from sheets after export
+                    await loadDataFromSheets();
                 } else {
                     throw new Error(result.error || 'Export failed');
                 }
             } catch (error) {
                 console.error('Export error:', error);
-                updateSyncStatus('Export failed', 'error');
-                alert('Export failed. Please try again later.');
+                updateSyncStatus('Export failed: ' + error.message, 'error');
+                alert('Export failed: ' + error.message);
             } finally {
                 hideLoading();
             }
@@ -498,7 +643,7 @@
             loading.style.display = 'none';
         }
 
-        // UI functions (same as before)
+        // UI functions
         function showForm() {
             formContainer.style.display = 'block';
             searchContainer.style.display = 'none';
@@ -535,6 +680,7 @@
             profileCards.innerHTML = '';
             
             if (profilesToShow.length === 0) {
+                noResults.textContent = 'No profiles found';
                 noResults.style.display = 'block';
                 profileCards.appendChild(noResults);
                 return;
