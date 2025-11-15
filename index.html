@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeamanAgency - Google Sheets Database</title>
+    <style>
+        :root {
+            --primary: #1a6aa2;
+            --secondary: #2c8cba;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .sync-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        .sync-indicator.syncing {
+            background-color: #ff9800;
+        }
+        
+        .sync-indicator.error {
+            background-color: #f44336;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e68900;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Rest of the CSS remains the same as previous version */
+        .form-container, .search-container, .profile-cards {
+            /* Previous styles */
+        }
+        
+        /* Add any other necessary styles from previous version */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>SEAMAN Agency - Google Sheets Database</h1>
+                <div class="sync-status">
+                    <div class="sync-indicator" id="syncIndicator"></div>
+                    <span id="syncStatus">Connected to Google Sheets</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Syncing with Google Sheets...</p>
+        </div>
+        
+        <div class="btn-group">
+            <button id="addDataBtn" class="btn-primary">Add Data</button>
+            <button id="searchBtn" class="btn-secondary">Search</button>
+            <button id="syncBtn" class="btn-secondary">Sync Now</button>
+            <button id="exportBtn" class="btn-primary">Export to Sheet</button>
+        </div>
+        
+        <!-- Rest of your HTML structure remains the same -->
+        <div id="searchContainer" class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Enter name, rank, or NRC to search...">
+                <button id="searchSubmit">Search</button>
+            </div>
+        </div>
+        
+        <div id="formContainer" class="form-container">
+            <h2 class="form-title">Add New Seaman Profile</h2>
+            <form id="profileForm">
+                <div class="form-grid">
+                    <!-- Your form fields here (same as before) -->
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rank">Rank</label>
+                        <select id="rank" required>
+                            <option value="">Select Rank</option>
+                            <option value="D/R">D/R</option>
+                            <option value="E/R">E/R</option>
+                            <option value="ET/R">ET/R</option>
+                            <option value="G/S">G/S</option>
+                            <option value="C/CK">C/CK</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nrc">NRC Number</label>
+                        <input type="text" id="nrc" placeholder="e.g., 12/ABC(N)123456" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fatherName">Father's Name</label>
+                        <input type="text" id="fatherName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="motherName">Mother's Name</label>
+                        <input type="text" id="motherName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birthdate">Birthdate</label>
+                        <input type="date" id="birthdate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="distinguishingMark">Distinguishing Mark</label>
+                        <textarea id="distinguishingMark" placeholder="e.g., Tattoo on left arm, scar on chin, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fees">Fees</label>
+                        <input type="number" id="fees" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feesPercentage">Fees Percentage (%)</label>
+                        <input type="number" id="feesPercentage" min="0" max="100" required>
+                        <div class="progress-bar">
+                            <div class="progress" id="feesProgress"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="btn-primary">Save to Google Sheets</button>
+                    <button type="button" id="cancelBtn" class="btn-secondary" style="margin-left: 10px;">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="profileCards" class="profile-cards">
+            <div class="no-results" id="noResults">
+                Loading data from Google Sheets...
+            </div>
+        </div>
+        
+        <footer>
+            <p>Seaman Agency - Google Sheets Database System &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Google Sheets Configuration
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzuCkPvuI3MFmWz1QCNtlUzmspE_ZSTGIhiC3hAHYGG6C-DesSxlGVvzbPIpJk2YqCI/exec'; // Replace with your deployed Apps Script URL
+        
+        let profiles = [];
+        let isOnline = true;
+
+        // DOM elements
+        const loading = document.getElementById('loading');
+        const syncIndicator = document.getElementById('syncIndicator');
+        const syncStatus = document.getElementById('syncStatus');
+        const syncBtn = document.getElementById('syncBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const addDataBtn = document.getElementById('addDataBtn');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchContainer = document.getElementById('searchContainer');
+        const formContainer = document.getElementById('formContainer');
+        const profileForm = document.getElementById('profileForm');
+        const profileCards = document.getElementById('profileCards');
+        const searchInput = document.getElementById('searchInput');
+        const searchSubmit = document.getElementById('searchSubmit');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const noResults = document.getElementById('noResults');
+        const feesPercentage = document.getElementById('feesPercentage');
+        const feesProgress = document.getElementById('feesProgress');
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', initApp);
+        syncBtn.addEventListener('click', syncWithSheets);
+        exportBtn.addEventListener('click', exportToSheets);
+        addDataBtn.addEventListener('click', showForm);
+        searchBtn.addEventListener('click', showSearch);
+        profileForm.addEventListener('submit', saveProfile);
+        searchSubmit.addEventListener('click', searchProfiles);
+        cancelBtn.addEventListener('click', hideForm);
+        feesPercentage.addEventListener('input', updateProgressBar);
+
+        // Initialize application
+        async function initApp() {
+            updateSyncStatus('Connecting to Google Sheets...', 'syncing');
+            await loadDataFromSheets();
+        }
+
+        // Update sync status
+        function updateSyncStatus(message, status = 'connected') {
+            syncStatus.textContent = message;
+            syncIndicator.className = 'sync-indicator ' + status;
+        }
+
+        // Load data from Google Sheets
+        async function loadDataFromSheets() {
+            showLoading();
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getData`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    profiles = data.data;
+                    updateSyncStatus('Connected to Google Sheets', 'connected');
+                    displayProfiles(profiles);
+                } else {
+                    throw new Error(data.error || 'Failed to load data');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                updateSyncStatus('Offline - Using local data', 'error');
+                // Fallback to local storage
+                profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+                displayProfiles(profiles);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Save profile to Google Sheets
+        async function saveProfile(e) {
+            e.preventDefault();
+            
+            const profile = {
+                id: Date.now(),
+                name: document.getElementById('name').value,
+                rank: document.getElementById('rank').value,
+                nrc: document.getElementById('nrc').value,
+                fatherName: document.getElementById('fatherName').value,
+                motherName: document.getElementById('motherName').value,
+                phone: document.getElementById('phone').value,
+                birthdate: document.getElementById('birthdate').value,
+                address: document.getElementById('address').value,
+                distinguishingMark: document.getElementById('distinguishingMark').value,
+                fees: document.getElementById('fees').value,
+                feesPercentage: document.getElementById('feesPercentage').value,
+                timestamp: new Date().toISOString()
+            };
+
+            showLoading();
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'addProfile',
+                        data: profile
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Profile saved to Google Sheets successfully!');
+                    profiles.push(profile);
+                    localStorage.setItem('profiles', JSON.stringify(profiles));
+                    hideForm();
+                    displayProfiles(profiles);
+                    updateSyncStatus('Data saved to Google Sheets', 'connected');
+                } else {
+                    throw new Error(result.error || 'Failed to save data');
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+                // Fallback to local storage
+                profiles.push(profile);
+                localStorage.setItem('profiles', JSON.stringify(profiles));
+                alert('Saved locally (offline mode). Data will sync when online.');
+                updateSyncStatus('Saved locally - Will sync when online', 'syncing');
+                hideForm();
+                displayProfiles(profiles);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Sync with Google Sheets
+        async function syncWithSheets() {
+            showLoading();
+            updateSyncStatus('Syncing with Google Sheets...', 'syncing');
+            
+            try {
+                // Get local data that needs to be synced
+                const localProfiles = JSON.parse(localStorage.getItem('profiles')) || [];
+                
+                if (localProfiles.length > 0) {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: 'syncData',
+                            data: localProfiles
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Clear local storage after successful sync
+                        localStorage.removeItem('profiles');
+                        await loadDataFromSheets();
+                        alert('Data synced successfully with Google Sheets!');
+                    } else {
+                        throw new Error(result.error || 'Sync failed');
+                    }
+                } else {
+                    await loadDataFromSheets();
+                    alert('Data is already synced with Google Sheets!');
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+                updateSyncStatus('Sync failed', 'error');
+                alert('Sync failed. Please try again later.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Export current data to Google Sheets
+        async function exportToSheets() {
+            showLoading();
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'exportData',
+                        data: profiles
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Data exported to Google Sheets successfully!');
+                    updateSyncStatus('Data exported successfully', 'connected');
+                } else {
+                    throw new Error(result.error || 'Export failed');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                updateSyncStatus('Export failed', 'error');
+                alert('Export failed. Please try again later.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Loading functions
+        function showLoading() {
+            loading.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        // UI functions (same as before)
+        function showForm() {
+            formContainer.style.display = 'block';
+            searchContainer.style.display = 'none';
+            profileForm.reset();
+            updateProgressBar();
+        }
+
+        function hideForm() {
+            formContainer.style.display = 'none';
+        }
+
+        function showSearch() {
+            searchContainer.style.display = 'block';
+            formContainer.style.display = 'none';
+        }
+
+        function updateProgressBar() {
+            const percentage = feesPercentage.value || 0;
+            feesProgress.style.width = `${percentage}%`;
+        }
+
+        function searchProfiles() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredProfiles = profiles.filter(profile => 
+                profile.name.toLowerCase().includes(searchTerm) ||
+                profile.rank.toLowerCase().includes(searchTerm) ||
+                profile.nrc.toLowerCase().includes(searchTerm)
+            );
+            
+            displayProfiles(filteredProfiles);
+        }
+
+        function displayProfiles(profilesToShow) {
+            profileCards.innerHTML = '';
+            
+            if (profilesToShow.length === 0) {
+                noResults.style.display = 'block';
+                profileCards.appendChild(noResults);
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            profilesToShow.forEach(profile => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${profile.name}</h3>
+                        <p>${profile.rank}</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-details">
+                            <div class="card-detail">
+                                <span class="detail-label">NRC:</span>
+                                <span class="detail-value">${profile.nrc}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Phone:</span>
+                                <span class="detail-value">${profile.phone}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Birthdate:</span>
+                                <span class="detail-value">${profile.birthdate}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Father:</span>
+                                <span class="detail-value">${profile.fatherName}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Mother:</span>
+                                <span class="detail-value">${profile.motherName}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Fees:</span>
+                                <span class="detail-value">$${profile.fees}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Fees Paid:</span>
+                                <span class="detail-value">${profile.feesPercentage}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${profile.feesPercentage}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    alert(`Viewing details for ${profile.name}\n\nRank: ${profile.rank}\nNRC: ${profile.nrc}\nPhone: ${profile.phone}\nBirthdate: ${profile.birthdate}\nFather: ${profile.fatherName}\nMother: ${profile.motherName}\nAddress: ${profile.address}\nDistinguishing Mark: ${profile.distinguishingMark}\nFees: $${profile.fees}\nFees Paid: ${profile.feesPercentage}%`);
+                });
+                
+                profileCards.appendChild(card);
+            });
+        }
+
+        // Initialize progress bar
+        updateProgressBar();
+    </script>
+</body>
+</html>
