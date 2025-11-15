@@ -331,7 +331,7 @@
         
         <div id="searchContainer" class="search-container">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Enter name, rank, or NRC to search...">
+                <input type="text" id="searchInput" placeholder="Enter name, rank, or NRC to search..." name="searchInput">
                 <button id="searchSubmit">Search</button>
             </div>
         </div>
@@ -342,12 +342,12 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="name">Full Name</label>
-                        <input type="text" id="name" required>
+                        <input type="text" id="name" name="name" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="rank">Rank</label>
-                        <select id="rank" required>
+                        <select id="rank" name="rank" required>
                             <option value="">Select Rank</option>
                             <option value="D/R">D/R</option>
                             <option value="E/R">E/R</option>
@@ -359,47 +359,47 @@
                     
                     <div class="form-group">
                         <label for="nrc">NRC Number</label>
-                        <input type="text" id="nrc" placeholder="e.g., 12/ABC(N)123456" required>
+                        <input type="text" id="nrc" name="nrc" placeholder="e.g., 12/ABC(N)123456" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="fatherName">Father's Name</label>
-                        <input type="text" id="fatherName" required>
+                        <input type="text" id="fatherName" name="fatherName" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="motherName">Mother's Name</label>
-                        <input type="text" id="motherName" required>
+                        <input type="text" id="motherName" name="motherName" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" required>
+                        <input type="tel" id="phone" name="phone" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="birthdate">Birthdate</label>
-                        <input type="date" id="birthdate" required>
+                        <input type="date" id="birthdate" name="birthdate" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="address">Address</label>
-                        <textarea id="address" required></textarea>
+                        <textarea id="address" name="address" required></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label for="distinguishingMark">Distinguishing Mark</label>
-                        <textarea id="distinguishingMark" placeholder="e.g., Tattoo on left arm, scar on chin, etc."></textarea>
+                        <textarea id="distinguishingMark" name="distinguishingMark" placeholder="e.g., Tattoo on left arm, scar on chin, etc."></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label for="fees">Fees</label>
-                        <input type="number" id="fees" required>
+                        <input type="number" id="fees" name="fees" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="feesPercentage">Fees Percentage (%)</label>
-                        <input type="number" id="feesPercentage" min="0" max="100" required>
+                        <input type="number" id="feesPercentage" name="feesPercentage" min="0" max="100" required>
                         <div class="progress-bar">
                             <div class="progress" id="feesProgress"></div>
                         </div>
@@ -732,11 +732,21 @@
                         </div>
                     </div>
                 `;
-                
                 card.addEventListener('click', () => {
-                    alert(`Viewing details for ${profile.name}\n\nRank: ${profile.rank}\nNRC: ${profile.nrc}\nPhone: ${profile.phone}\nBirthdate: ${profile.birthdate}\nFather: ${profile.fatherName}\nMother: ${profile.motherName}\nAddress: ${profile.address}\nDistinguishing Mark: ${profile.distinguishingMark}\nFees: $${profile.fees}\nFees Paid: ${profile.feesPercentage}%`);
+                    alert(
+                        `Viewing details for ${profile.name}\n` +
+                        `Rank: ${profile.rank}\n` +
+                        `NRC: ${profile.nrc}\n` +
+                        `Phone: ${profile.phone}\n` +
+                        `Birthdate: ${profile.birthdate}\n` +
+                        `Father: ${profile.fatherName}\n` +
+                        `Mother: ${profile.motherName}\n` +
+                        `Address: ${profile.address}\n` +
+                        `Distinguishing Mark: ${profile.distinguishingMark}\n` +
+                        `Fees: $${profile.fees}\n` +
+                        `Fees Paid: ${profile.feesPercentage}%`
+                    );
                 });
-                
                 profileCards.appendChild(card);
             });
         }
