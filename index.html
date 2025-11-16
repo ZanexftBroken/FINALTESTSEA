@@ -225,6 +225,929 @@
             min-height: 80px;
         }
         
+        /* Checkbox Styles */
+        .checkbox-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .checkbox-section {
+            margin-bottom: 25px;
+        }
+        
+        .checkbox-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--primary);
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 5px;
+        }
+        
+        .checkbox-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+            color: #555;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--success);
+            border-radius: 5px;
+        }
+        
+        .profile-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .profile-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .card-details {
+            margin-bottom: 15px;
+        }
+        
+        .card-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+            font-size: 18px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #777;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>SEAMAN Agency - New System</h1>
+                <div class="sync-status">
+                    <div class="sync-indicator" id="syncIndicator"></div>
+                    <span id="syncStatus">Initializing...</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p id="loadingText">Processing...</p>
+        </div>
+        
+        <div class="btn-group">
+            <button id="addDataBtn" class="btn-primary">Add Data</button>
+            <button id="searchBtn" class="btn-secondary">Search</button>
+            <button id="syncBtn" class="btn-secondary">Sync Now</button>
+            <button id="exportBtn" class="btn-primary">Export to Sheet</button>
+            <button id="testBtn" class="btn-secondary">Test Connection</button>
+        </div>
+        
+        <div id="searchContainer" class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Enter name, rank, or NRC to search...">
+                <button id="searchSubmit">Search</button>
+            </div>
+        </div>
+        
+        <div id="formContainer" class="form-container">
+            <h2 class="form-title">Add New Seaman Profile</h2>
+            <form id="profileForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rank">Rank *</label>
+                        <select id="rank" required>
+                            <option value="">Select Rank</option>
+                            <option value="D/R">D/R</option>
+                            <option value="E/R">E/R</option>
+                            <option value="ET/R">ET/R</option>
+                            <option value="G/S">G/S</option>
+                            <option value="C/CK">C/CK</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nrc">NRC Number *</label>
+                        <input type="text" id="nrc" placeholder="e.g., 12/ABC(N)123456" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fatherName">Father's Name *</label>
+                        <input type="text" id="fatherName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="motherName">Mother's Name *</label>
+                        <input type="text" id="motherName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birthdate">Birthdate *</label>
+                        <input type="date" id="birthdate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Address *</label>
+                        <textarea id="address" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="distinguishingMark">Distinguishing Mark</label>
+                        <textarea id="distinguishingMark" placeholder="e.g., Tattoo on left arm, scar on chin, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fees">Fees *</label>
+                        <input type="number" id="fees" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feesPercentage">Fees Percentage (%) *</label>
+                        <input type="number" id="feesPercentage" min="0" max="100" required>
+                        <div class="progress-bar">
+                            <div class="progress" id="feesProgress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checkbox Sections -->
+                <div class="checkbox-group">
+                    <div class="checkbox-section">
+                        <div class="checkbox-section-title">Certificates & Documents</div>
+                        <div class="checkbox-row">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="bst" name="certificates" value="BST">
+                                <label for="bst">BST</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="pd" name="certificates" value="PD">
+                                <label for="pd">PD</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="pe" name="certificates" value="PE">
+                                <label for="pe">PE</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cck" name="certificates" value="CCK">
+                                <label for="cck">CCK</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-section">
+                        <div class="checkbox-section-title">Additional Certificates</div>
+                        <div class="checkbox-row">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ssa" name="certificates" value="SSA">
+                                <label for="ssa">SSA</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="dsd" name="certificates" value="DSD">
+                                <label for="dsd">DSD</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cdc" name="certificates" value="CDC">
+                                <label for="cdc">CDC</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cmc" name="certificates" value="CMC">
+                                <label for="cmc">CMC</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-section">
+                        <div class="checkbox-section-title">Special Certificates</div>
+                        <div class="checkbox-row">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="psc" name="certificates" value="PSC">
+                                <label for="psc">PSC</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="tff" name="certificates" value="TFF">
+                                <label for="tff">TFF</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="aio" name="certificates" value="AIO">
+                                <label for="aio">AIO</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="sid" name="certificates" value="SID">
+                                <label for="sid">SID</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="btn-primary">Save to Google Sheets</button>
+                    <button type="button" id="cancelBtn" class="btn-secondary" style="margin-left: 10px;">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="profileCards" class="profile-cards">
+            <div class="no-results" id="noResults">
+                Loading data from Google Sheets...
+            </div>
+        </div>
+        
+        <footer>
+            <p>Seaman Agency - New Google Sheets System &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Google Sheets Configuration - YOUR NEW SCRIPT URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiGqpESSd1y4Jv8EHI57QyTR47IG8Tnv_b546lKdhNj1w0zSm3nyNi-h8YX08jzIN5/exec';
+        
+        let profiles = [];
+
+        // DOM elements
+        const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        const syncIndicator = document.getElementById('syncIndicator');
+        const syncStatus = document.getElementById('syncStatus');
+        const syncBtn = document.getElementById('syncBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const testBtn = document.getElementById('testBtn');
+        const addDataBtn = document.getElementById('addDataBtn');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchContainer = document.getElementById('searchContainer');
+        const formContainer = document.getElementById('formContainer');
+        const profileForm = document.getElementById('profileForm');
+        const profileCards = document.getElementById('profileCards');
+        const searchInput = document.getElementById('searchInput');
+        const searchSubmit = document.getElementById('searchSubmit');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const noResults = document.getElementById('noResults');
+        const feesPercentage = document.getElementById('feesPercentage');
+        const feesProgress = document.getElementById('feesProgress');
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', initApp);
+        syncBtn.addEventListener('click', syncWithSheets);
+        exportBtn.addEventListener('click', exportToSheets);
+        testBtn.addEventListener('click', testConnection);
+        addDataBtn.addEventListener('click', showForm);
+        searchBtn.addEventListener('click', showSearch);
+        profileForm.addEventListener('submit', saveProfile);
+        searchSubmit.addEventListener('click', searchProfiles);
+        cancelBtn.addEventListener('click', hideForm);
+        feesPercentage.addEventListener('input', updateProgressBar);
+
+        // Initialize application
+        async function initApp() {
+            updateSyncStatus('Testing connection...', 'syncing');
+            await testConnection();
+        }
+
+        // Update sync status
+        function updateSyncStatus(message, status = 'connected') {
+            syncStatus.textContent = message;
+            syncIndicator.className = 'sync-indicator ' + status;
+        }
+
+        // Test connection
+        async function testConnection() {
+            showLoading('Testing connection to Google Sheets...');
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=test&t=${Date.now()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateSyncStatus('Connected successfully!', 'connected');
+                    await loadDataFromSheets();
+                } else {
+                    throw new Error(data.error || 'Connection test failed');
+                }
+            } catch (error) {
+                console.error('Connection test error:', error);
+                updateSyncStatus('Connection failed: ' + error.message, 'error');
+                alert('Connection test failed: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Load data from Google Sheets
+        async function loadDataFromSheets() {
+            showLoading('Loading data from Google Sheets...');
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getData&t=${Date.now()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    profiles = data.data;
+                    updateSyncStatus(`Connected - ${profiles.length} profiles loaded`, 'connected');
+                    displayProfiles(profiles);
+                } else {
+                    throw new Error(data.error || 'Failed to load data');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                updateSyncStatus('Offline - Using local data', 'error');
+                // Fallback to local storage
+                profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+                displayProfiles(profiles);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Save profile to Google Sheets
+        async function saveProfile(e) {
+            e.preventDefault();
+            
+            // Get selected certificates
+            const selectedCertificates = [];
+            document.querySelectorAll('input[name="certificates"]:checked').forEach(checkbox => {
+                selectedCertificates.push(checkbox.value);
+            });
+
+            const profile = {
+                id: Date.now(),
+                name: document.getElementById('name').value,
+                rank: document.getElementById('rank').value,
+                nrc: document.getElementById('nrc').value,
+                fatherName: document.getElementById('fatherName').value,
+                motherName: document.getElementById('motherName').value,
+                phone: document.getElementById('phone').value,
+                birthdate: document.getElementById('birthdate').value,
+                address: document.getElementById('address').value,
+                distinguishingMark: document.getElementById('distinguishingMark').value,
+                fees: document.getElementById('fees').value,
+                feesPercentage: document.getElementById('feesPercentage').value,
+                certificates: selectedCertificates.join(', '), // Convert array to string
+                timestamp: new Date().toISOString()
+            };
+
+            showLoading('Saving profile to Google Sheets...');
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'addProfile',
+                        data: profile
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Profile saved to Google Sheets successfully!');
+                    profiles.push(profile);
+                    localStorage.setItem('profiles', JSON.stringify(profiles));
+                    hideForm();
+                    displayProfiles(profiles);
+                    updateSyncStatus(`Data saved - ${profiles.length} profiles`, 'connected');
+                } else {
+                    throw new Error(result.error || 'Failed to save data');
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+                // Fallback to local storage
+                profiles.push(profile);
+                localStorage.setItem('profiles', JSON.stringify(profiles));
+                alert('Saved locally (offline mode). Data will sync when online.');
+                updateSyncStatus('Saved locally - Will sync when online', 'syncing');
+                hideForm();
+                displayProfiles(profiles);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Sync with Google Sheets
+        async function syncWithSheets() {
+            showLoading('Syncing with Google Sheets...');
+            updateSyncStatus('Syncing with Google Sheets...', 'syncing');
+            
+            try {
+                // Get local data that needs to be synced
+                const localProfiles = JSON.parse(localStorage.getItem('profiles')) || [];
+                
+                if (localProfiles.length > 0) {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: 'syncData',
+                            data: localProfiles
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Clear local storage after successful sync
+                        localStorage.removeItem('profiles');
+                        await loadDataFromSheets();
+                        alert('Data synced successfully with Google Sheets!');
+                    } else {
+                        throw new Error(result.error || 'Sync failed');
+                    }
+                } else {
+                    await loadDataFromSheets();
+                    alert('Data is already synced with Google Sheets!');
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+                updateSyncStatus('Sync failed: ' + error.message, 'error');
+                alert('Sync failed: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Export current data to Google Sheets
+        async function exportToSheets() {
+            showLoading('Exporting data to Google Sheets...');
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'exportData',
+                        data: profiles
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Data exported to Google Sheets successfully!');
+                    updateSyncStatus('Data exported successfully', 'connected');
+                    // Reload data from sheets after export
+                    await loadDataFromSheets();
+                } else {
+                    throw new Error(result.error || 'Export failed');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                updateSyncStatus('Export failed: ' + error.message, 'error');
+                alert('Export failed: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Loading functions
+        function showLoading(text = 'Processing...') {
+            loadingText.textContent = text;
+            loading.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        // UI functions
+        function showForm() {
+            formContainer.style.display = 'block';
+            searchContainer.style.display = 'none';
+            profileForm.reset();
+            updateProgressBar();
+        }
+
+        function hideForm() {
+            formContainer.style.display = 'none';
+        }
+
+        function showSearch() {
+            searchContainer.style.display = 'block';
+            formContainer.style.display = 'none';
+        }
+
+        function updateProgressBar() {
+            const percentage = feesPercentage.value || 0;
+            feesProgress.style.width = `${percentage}%`;
+        }
+
+        function searchProfiles() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredProfiles = profiles.filter(profile => 
+                profile.name.toLowerCase().includes(searchTerm) ||
+                profile.rank.toLowerCase().includes(searchTerm) ||
+                profile.nrc.toLowerCase().includes(searchTerm)
+            );
+            
+            displayProfiles(filteredProfiles);
+        }
+
+        function displayProfiles(profilesToShow) {
+            profileCards.innerHTML = '';
+            
+            if (profilesToShow.length === 0) {
+                noResults.textContent = 'No profiles found';
+                noResults.style.display = 'block';
+                profileCards.appendChild(noResults);
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            profilesToShow.forEach(profile => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${profile.name}</h3>
+                        <p>${profile.rank}</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-details">
+                            <div class="card-detail">
+                                <span class="detail-label">NRC:</span>
+                                <span class="detail-value">${profile.nrc}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Phone:</span>
+                                <span class="detail-value">${profile.phone}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Birthdate:</span>
+                                <span class="detail-value">${profile.birthdate}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Father:</span>
+                                <span class="detail-value">${profile.fatherName}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Mother:</span>
+                                <span class="detail-value">${profile.motherName}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Fees:</span>
+                                <span class="detail-value">$${profile.fees}</span>
+                            </div>
+                            <div class="card-detail">
+                                <span class="detail-label">Fees Paid:</span>
+                                <span class="detail-value">${profile.feesPercentage}%</span>
+                            </div>
+                            ${profile.certificates ? `
+                            <div class="card-detail">
+                                <span class="detail-label">Certificates:</span>
+                                <span class="detail-value">${profile.certificates}</span>
+                            </div>
+                            ` : ''}
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${profile.feesPercentage}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    const certText = profile.certificates ? `\nCertificates: ${profile.certificates}` : '';
+                    alert(`Viewing details for ${profile.name}\n\nRank: ${profile.rank}\nNRC: ${profile.nrc}\nPhone: ${profile.phone}\nBirthdate: ${profile.birthdate}\nFather: ${profile.fatherName}\nMother: ${profile.motherName}\nAddress: ${profile.address}\nDistinguishing Mark: ${profile.distinguishingMark}\nFees: $${profile.fees}\nFees Paid: ${profile.feesPercentage}%${certText}`);
+                });
+                
+                profileCards.appendChild(card);
+            });
+        }
+
+        // Initialize progress bar
+        updateProgressBar();
+    </script>
+</body>
+</html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeamanAgency - New Google Sheets System</title>
+    <style>
+        :root {
+            --primary: #1a6aa2;
+            --secondary: #2c8cba;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .sync-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        .sync-indicator.syncing {
+            background-color: #ff9800;
+        }
+        
+        .sync-indicator.error {
+            background-color: #f44336;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e68900;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .search-container {
+            display: none;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .search-box button {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .form-container {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
         .progress-bar {
             height: 10px;
             background-color: #f0f0f0;
