@@ -1,37 +1,64 @@
-// Google Apps Script code for Seaman Agency Database
+// Seaman Agency Database - New Version
+// Created with your new Web URL
+
 function doGet(e) {
-  const action = e.parameter.action;
-  
-  if (action === 'getData') {
-    return getDataFromSheet();
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({
-    success: false,
-    error: 'Invalid action'
-  })).setMimeType(ContentService.MimeType.JSON);
+  return handleRequest(e);
 }
 
 function doPost(e) {
-  const data = JSON.parse(e.postData.contents);
-  const action = data.action;
+  return handleRequest(e);
+}
+
+function handleRequest(e) {
+  let result;
   
   try {
-    if (action === 'addProfile') {
-      return addProfileToSheet(data.data);
-    } else if (action === 'syncData') {
-      return syncDataToSheet(data.data);
-    } else if (action === 'exportData') {
-      return exportDataToSheet(data.data);
+    if (e.postData) {
+      // POST request
+      const data = JSON.parse(e.postData.contents);
+      const action = data.action;
+      
+      if (action === 'addProfile') {
+        result = addProfileToSheet(data.data);
+      } else if (action === 'syncData') {
+        result = syncDataToSheet(data.data);
+      } else if (action === 'exportData') {
+        result = exportDataToSheet(data.data);
+      } else {
+        throw new Error('Invalid action: ' + action);
+      }
     } else {
-      throw new Error('Invalid action');
+      // GET request
+      const action = e.parameter.action;
+      
+      if (action === 'getData') {
+        result = getDataFromSheet();
+      } else if (action === 'test') {
+        result = { success: true, message: 'API is working!' };
+      } else {
+        throw new Error('Invalid action: ' + action);
+      }
     }
+    
+    return createResponse(result);
+      
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
+    return createResponse({
       success: false,
       error: error.message
-    })).setMimeType(ContentService.MimeType.JSON);
+    });
   }
+}
+
+function createResponse(data) {
+  const output = ContentService.createTextOutput(JSON.stringify(data));
+  output.setMimeType(ContentService.MimeType.JSON);
+  output.setHeaders({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  });
+  return output;
 }
 
 function getDataFromSheet() {
@@ -43,32 +70,36 @@ function getDataFromSheet() {
     const profiles = [];
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      profiles.push({
-        id: row[0],
-        name: row[1],
-        rank: row[2],
-        nrc: row[3],
-        fatherName: row[4],
-        motherName: row[5],
-        phone: row[6],
-        birthdate: row[7],
-        address: row[8],
-        distinguishingMark: row[9],
-        fees: row[10],
-        feesPercentage: row[11],
-        timestamp: row[12]
-      });
+      // Check if row has data
+      if (row[0] && row[0].toString().trim() !== '') {
+        profiles.push({
+          id: row[0] || '',
+          name: row[1] || '',
+          rank: row[2] || '',
+          nrc: row[3] || '',
+          fatherName: row[4] || '',
+          motherName: row[5] || '',
+          phone: row[6] || '',
+          birthdate: row[7] || '',
+          address: row[8] || '',
+          distinguishingMark: row[9] || '',
+          fees: row[10] || '',
+          feesPercentage: row[11] || '',
+          timestamp: row[12] || ''
+        });
+      }
     }
     
-    return ContentService.createTextOutput(JSON.stringify({
+    return {
       success: true,
-      data: profiles
-    })).setMimeType(ContentService.MimeType.JSON);
+      data: profiles,
+      count: profiles.length
+    };
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
+    return {
       success: false,
-      error: error.message
-    })).setMimeType(ContentService.MimeType.JSON);
+      error: 'Get data error: ' + error.message
+    };
   }
 }
 
@@ -88,30 +119,31 @@ function addProfileToSheet(profile) {
     
     // Add new profile
     sheet.getRange(lastRow + 1, 1, 1, 13).setValues([[
-      profile.id,
-      profile.name,
-      profile.rank,
-      profile.nrc,
-      profile.fatherName,
-      profile.motherName,
-      profile.phone,
-      profile.birthdate,
-      profile.address,
-      profile.distinguishingMark,
-      profile.fees,
-      profile.feesPercentage,
+      profile.id || Date.now(),
+      profile.name || '',
+      profile.rank || '',
+      profile.nrc || '',
+      profile.fatherName || '',
+      profile.motherName || '',
+      profile.phone || '',
+      profile.birthdate || '',
+      profile.address || '',
+      profile.distinguishingMark || '',
+      profile.fees || '0',
+      profile.feesPercentage || '0',
       profile.timestamp || new Date().toISOString()
     ]]);
     
-    return ContentService.createTextOutput(JSON.stringify({
+    return {
       success: true,
-      message: 'Profile added successfully'
-    })).setMimeType(ContentService.MimeType.JSON);
+      message: 'Profile added successfully',
+      id: profile.id
+    };
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
+    return {
       success: false,
-      error: error.message
-    })).setMimeType(ContentService.MimeType.JSON);
+      error: 'Add profile error: ' + error.message
+    };
   }
 }
 
@@ -119,10 +151,8 @@ function syncDataToSheet(profiles) {
   try {
     const sheet = getSheet();
     
-    // Clear existing data (optional - depends on your needs)
-    // sheet.clearContents();
-    
-    // Add headers
+    // Clear existing data and add headers
+    sheet.clearContents();
     sheet.getRange(1, 1, 1, 13).setValues([[
       'ID', 'Name', 'Rank', 'NRC', 'Father Name', 'Mother Name', 
       'Phone', 'Birthdate', 'Address', 'Distinguishing Mark', 
@@ -131,18 +161,18 @@ function syncDataToSheet(profiles) {
     
     // Add all profiles
     const data = profiles.map(profile => [
-      profile.id,
-      profile.name,
-      profile.rank,
-      profile.nrc,
-      profile.fatherName,
-      profile.motherName,
-      profile.phone,
-      profile.birthdate,
-      profile.address,
-      profile.distinguishingMark,
-      profile.fees,
-      profile.feesPercentage,
+      profile.id || Date.now(),
+      profile.name || '',
+      profile.rank || '',
+      profile.nrc || '',
+      profile.fatherName || '',
+      profile.motherName || '',
+      profile.phone || '',
+      profile.birthdate || '',
+      profile.address || '',
+      profile.distinguishingMark || '',
+      profile.fees || '0',
+      profile.feesPercentage || '0',
       profile.timestamp || new Date().toISOString()
     ]);
     
@@ -150,36 +180,90 @@ function syncDataToSheet(profiles) {
       sheet.getRange(2, 1, data.length, 13).setValues(data);
     }
     
-    return ContentService.createTextOutput(JSON.stringify({
+    return {
       success: true,
       message: `Synced ${profiles.length} profiles successfully`
-    })).setMimeType(ContentService.MimeType.JSON);
+    };
   } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
+    return {
       success: false,
-      error: error.message
-    })).setMimeType(ContentService.MimeType.JSON);
+      error: 'Sync error: ' + error.message
+    };
   }
 }
 
 function exportDataToSheet(data) {
-  // This function can be customized based on your export needs
-  return ContentService.createTextOutput(JSON.stringify({
-    success: true,
-    message: 'Export completed successfully'
-  })).setMimeType(ContentService.MimeType.JSON);
+  try {
+    const sheet = getSheet();
+    
+    // Clear and export all data
+    sheet.clearContents();
+    sheet.getRange(1, 1, 1, 13).setValues([[
+      'ID', 'Name', 'Rank', 'NRC', 'Father Name', 'Mother Name', 
+      'Phone', 'Birthdate', 'Address', 'Distinguishing Mark', 
+      'Fees', 'Fees Percentage', 'Timestamp'
+    ]]);
+    
+    const exportData = data.map(profile => [
+      profile.id || Date.now(),
+      profile.name || '',
+      profile.rank || '',
+      profile.nrc || '',
+      profile.fatherName || '',
+      profile.motherName || '',
+      profile.phone || '',
+      profile.birthdate || '',
+      profile.address || '',
+      profile.distinguishingMark || '',
+      profile.fees || '0',
+      profile.feesPercentage || '0',
+      profile.timestamp || new Date().toISOString()
+    ]);
+    
+    if (exportData.length > 0) {
+      sheet.getRange(2, 1, exportData.length, 13).setValues(exportData);
+    }
+    
+    return {
+      success: true,
+      message: `Exported ${data.length} profiles successfully`
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: 'Export error: ' + error.message
+    };
+  }
 }
 
 function getSheet() {
-  const spreadsheetId = 'https://docs.google.com/spreadsheets/d/1DT2SFMHsQauE1I-Gp7bi9-hj-OVJYGpbMEx98Zz5O5g/edit?usp=sharing'; // Replace with your Google Sheet ID
-  const sheetName = 'SeamanProfiles'; // Your sheet name
+  // Your Spreadsheet ID - Same as before
+  const spreadsheetId = '1DT2SFMHsQauE1I-Gp7bi9-hj-OVJYGpbMEx98Zz5O5g';
+  
+  const sheetName = 'SeamanProfiles';
   
   const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
   let sheet = spreadsheet.getSheetByName(sheetName);
   
   if (!sheet) {
     sheet = spreadsheet.insertSheet(sheetName);
+    // Add headers to new sheet
+    sheet.getRange(1, 1, 1, 13).setValues([[
+      'ID', 'Name', 'Rank', 'NRC', 'Father Name', 'Mother Name', 
+      'Phone', 'Birthdate', 'Address', 'Distinguishing Mark', 
+      'Fees', 'Fees Percentage', 'Timestamp'
+    ]]);
   }
   
   return sheet;
+}
+
+// Test function to verify setup
+function testConnection() {
+  return {
+    success: true,
+    message: 'Seaman Agency Database API is working!',
+    timestamp: new Date().toISOString(),
+    sheet: getSheet().getName()
+  };
 }
